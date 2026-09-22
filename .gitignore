@@ -1,0 +1,53 @@
+# Dependances installees par Composer : elles se reinstallent avec
+# « composer install » a partir de composer.json et composer.lock.
+# Les versionner alourdit le depot de 12 Mo sans aucun benefice.
+/vendor/
+
+# Configuration locale : contient le mot de passe de la base de donnees.
+# Un fichier config.example.php sert de modele ; chacun copie et adapte.
+/config.php
+
+# Pages temporaires de parametrage et de diagnostic. Elles lisent les
+# identifiants de la base et executent des operations d'administration
+# sans authentification : elles n'ont rien a faire dans un depot.
+/configurer-droits.php
+/configurer-niveaux.php
+/exporter-configuration.php
+/migrer-base.php
+/verifier-imputations.php
+/patch_*.py
+
+# Donnees et fichiers produits par l'application.
+/uploads/*
+!/uploads/.htaccess
+/logs/*
+!/logs/.gitkeep
+
+# Videos de demonstration : 16 Mo de contenu binaire qui ne se versionne pas
+# utilement. A heberger ailleurs si vous voulez les conserver.
+*.mp4
+
+# Sauvegardes et exports de base.
+*.sql
+*.bak
+*.bak[0-9]
+*.backup
+*.old
+*.orig
+*.save
+*.zip
+*.rar
+*.tar
+*.gz
+
+# Fichiers systeme et editeurs.
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+
+# Fichiers parasites de macOS et dossier de corbeille local.
+._*
+/_to_delete/

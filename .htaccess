@@ -1,0 +1,24 @@
+<IfModule mod_rewrite.c>
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?request_uri=$1 [NC,L,QSA,B]
+</IfModule>
+
+# Redirection HTTPS desactivee pour les tests en local (MAMP).
+# A REACTIVER en production :
+# <IfModule mod_rewrite.c>
+# RewriteCond %{HTTPS} !=on
+# RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+# </IfModule>
+
+# Refuser l'acces aux fichiers qui ne doivent jamais etre telecharges :
+# sauvegardes, dumps de base, archives, journaux, fichiers de configuration.
+# Apache sert un .bak ou un .sql en texte brut : sans cette regle, le mot de
+# passe de la base et les mots de passe des utilisateurs sont telechargeables.
+<FilesMatch "(?i)\.(bak|bak[0-9]|backup|old|orig|save|swp|sql|zip|rar|tar|gz|log|ini|md)$">
+    Require all denied
+</FilesMatch>
+<FilesMatch "(?i)^(composer\.(json|lock)|\.env|\.DS_Store)$">
+    Require all denied
+</FilesMatch>
