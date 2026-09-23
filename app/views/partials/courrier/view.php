@@ -127,7 +127,7 @@ $show_export_btn = $this->show_export_btn;
                                             </span>
                                         </td>
                                     </tr>
-                                    <div><?php echo $data['objet'] ?? '' ; ?></div>
+                                    <div><?php echo nettoyer_html($data['objet'] ?? ''); ?></div>
                                     <tr  class="td-fichier">
                                         <th class="title"> <?php print_lang('fichier'); ?>: </th>
                                         <td class="value">

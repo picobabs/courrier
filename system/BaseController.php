@@ -134,6 +134,12 @@ class BaseController{
 	 */
 	public $filter_rules = false;
 
+	/**
+	 * Champs saisis avec l'editeur de texte riche, nettoyes par nettoyer_html()
+	 * @var array
+	 */
+	public $champs_html = array('objet');
+
 
 	function __construct(){
 		$this->view = new BaseView; //initialize the view renderer
@@ -277,6 +283,14 @@ class BaseController{
 	function validate_form($modeldata){
 		if(!empty($this->sanitize_array)){
 			$modeldata = GUMP::filter_input($modeldata, $this->sanitize_array);
+		}
+		// Champs saisis avec l'editeur HTML : ils ne passent pas par
+		// sanitize_string (qui detruirait la mise en forme) et etaient donc
+		// enregistres bruts. On ne garde que des balises de mise en forme sures.
+		foreach($this->champs_html as $champ){
+			if(isset($modeldata[$champ]) && is_string($modeldata[$champ])){
+				$modeldata[$champ] = nettoyer_html($modeldata[$champ]);
+			}
 		}
 
 		if($this->validate_captcha){

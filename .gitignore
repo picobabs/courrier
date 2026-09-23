@@ -22,6 +22,7 @@
 !/uploads/.htaccess
 /logs/*
 !/logs/.gitkeep
+!/logs/.htaccess
 
 # Videos de demonstration : 16 Mo de contenu binaire qui ne se versionne pas
 # utilement. A heberger ailleurs si vous voulez les conserver.

@@ -128,7 +128,7 @@ class Courrier_sortantController extends SecureController{
 			"expediteur.cellulaire AS expediteur_cellulaire", 
 			"nature_courrier.idnature AS nature_courrier_idnature", 
 			"nature_courrier.nature AS nature_courrier_nature");
-		if($value){
+		if($value && est_nom_de_colonne($rec_id)){
 			$db->where($rec_id, urldecode($value)); //select record based on field name
 		}
 		else{

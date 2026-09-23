@@ -82,7 +82,7 @@ class ExpediteurController extends SecureController{
 			"expediteur", 
 			"cellulaire", 
 			"ordinaire");
-		if($value){
+		if($value && est_nom_de_colonne($rec_id)){
 			$db->where($rec_id, urldecode($value)); //select record based on field name
 		}
 		else{

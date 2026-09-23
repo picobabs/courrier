@@ -156,7 +156,7 @@ $redirect_to = $this->redirect_to;
                                                         </div>
                                                         <div class="col-sm-8">
                                                             <div class="">
-                                                                <textarea placeholder="<?php print_lang('entrer_objet'); ?>" id="ctrl-objet"  required="" rows="5" name="objet" class="htmleditor form-control"><?php  echo $data['objet'] ?? '' ; ?></textarea>
+                                                                <textarea placeholder="<?php print_lang('entrer_objet'); ?>" id="ctrl-objet"  required="" rows="5" name="objet" class="htmleditor form-control"><?php  echo htmlspecialchars(nettoyer_html($data['objet'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></textarea>
                                                                 <!--<div class="invalid-feedback animated bounceIn text-center"><?php print_lang('veuillez_choisir_un_fichier'); ?></div>-->
                                                             </div>
                                                         </div>

@@ -38,6 +38,87 @@ function safe_sanitize_string($value)
 }
 
 /**
+ * Nettoie un texte riche (editeur HTML, ex. champ "objet" du courrier) avant
+ * enregistrement ou affichage. Seules des balises de mise en forme sont
+ * conservees ; scripts, iframes, attributs on*, liens javascript: sont
+ * supprimes. Sans cela, un utilisateur pouvait inserer du JavaScript qui
+ * s'executait chez tous ceux qui ouvraient le courrier (XSS stockee).
+ * @param string $html
+ * @return string
+ */
+function nettoyer_html($html)
+{
+	$html = (string) $html;
+	if ($html === '' || strpos($html, '<') === false && strpos($html, '&') === false) {
+		return $html;
+	}
+	$balises = array('p','br','b','strong','i','em','u','s','strike','sub','sup','span','div','font',
+		'ul','ol','li','blockquote','pre','code','hr','h1','h2','h3','h4','h5','h6',
+		'table','thead','tbody','tfoot','tr','td','th','caption','colgroup','col','a','img');
+	$attributs = array('href','src','alt','title','style','class','colspan','rowspan','align','color','face','size','width','height','target');
+	$doc = new DOMDocument();
+	$ancien = libxml_use_internal_errors(true);
+	$doc->loadHTML('<?xml encoding="UTF-8"><div id="__racine__">' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+	libxml_clear_errors();
+	libxml_use_internal_errors($ancien);
+	$racine = $doc->getElementById('__racine__');
+	if (!$racine) {
+		return htmlspecialchars(strip_tags($html), ENT_QUOTES, 'UTF-8');
+	}
+	$nettoyer = function ($noeud) use (&$nettoyer, $balises, $attributs) {
+		for ($i = $noeud->childNodes->length - 1; $i >= 0; $i--) {
+			$enfant = $noeud->childNodes->item($i);
+			if ($enfant->nodeType === XML_COMMENT_NODE || $enfant->nodeType === XML_PI_NODE) {
+				$noeud->removeChild($enfant);
+				continue;
+			}
+			if ($enfant->nodeType !== XML_ELEMENT_NODE) {
+				continue;
+			}
+			$nom = strtolower($enfant->nodeName);
+			if (in_array($nom, array('script','style','iframe','object','embed','frame','frameset','form','input','button','textarea','select','link','meta','base','svg','math','template','noscript'), true)) {
+				$noeud->removeChild($enfant);
+				continue;
+			}
+			$nettoyer($enfant);
+			if (!in_array($nom, $balises, true)) {
+				// balise inconnue : on garde son contenu, pas la balise
+				while ($enfant->firstChild) {
+					$noeud->insertBefore($enfant->firstChild, $enfant);
+				}
+				$noeud->removeChild($enfant);
+				continue;
+			}
+			for ($j = $enfant->attributes->length - 1; $j >= 0; $j--) {
+				$attr = $enfant->attributes->item($j);
+				$an = strtolower($attr->nodeName);
+				$val = trim($attr->nodeValue);
+				$garder = in_array($an, $attributs, true);
+				if ($garder && ($an === 'href' || $an === 'src')) {
+					$garder = (bool) preg_match('#^(https?:|mailto:|/|\#|[a-z0-9_\-./]+$)#i', $val)
+						|| ($an === 'src' && preg_match('#^data:image/(png|jpe?g|gif);base64,#i', $val));
+				}
+				if ($garder && $an === 'style') {
+					$garder = !preg_match('/expression|url\s*\(|javascript:|behavior|@import/i', $val);
+				}
+				if (!$garder) {
+					$enfant->removeAttribute($attr->nodeName);
+				}
+			}
+			if ($nom === 'a' && $enfant->getAttribute('target') !== '') {
+				$enfant->setAttribute('rel', 'noopener noreferrer');
+			}
+		}
+	};
+	$nettoyer($racine);
+	$sortie = '';
+	foreach ($racine->childNodes as $n) {
+		$sortie .= $doc->saveHTML($n);
+	}
+	return $sortie;
+}
+
+/**
  * Verifie qu'une valeur venue de l'URL est un simple nom de colonne
  * ("etat" ou "courrier.etat"). Les listes filtrent avec
  * $db->where($fieldname, $fieldvalue) : le nom de colonne est insere tel quel

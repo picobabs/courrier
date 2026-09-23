@@ -317,7 +317,7 @@ $show_pagination = $this->show_pagination;
                                                         <?php echo $data['intitule'] ?? '' ; ?> 
                                                     </span>
                                                 </div>
-                                                <div><?php echo $data['objet'] ?? '' ; ?></div>
+                                                <div><?php echo nettoyer_html($data['objet'] ?? ''); ?></div>
                                                 <div class="mb-2">  <?php Html :: page_link_file($data['fichier']); ?></div>
                                                 <div class="td-btn">
                                                     <?php if($can_view){ ?>

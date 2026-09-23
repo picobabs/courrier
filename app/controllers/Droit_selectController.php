@@ -94,7 +94,7 @@ class Droit_selectController extends SecureController{
 			"etat.etat AS etat_etat", 
 			"roles.role_id AS roles_role_id", 
 			"roles.role_name AS roles_role_name");
-		if($value){
+		if($value && est_nom_de_colonne($rec_id)){
 			$db->where($rec_id, urldecode($value)); //select record based on field name
 		}
 		else{

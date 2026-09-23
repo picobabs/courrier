@@ -146,7 +146,7 @@ $show_pagination = $this->show_pagination;
                                                 <td class="td-date_courrier"> <?php echo $data['date_courrier'] ?? '' ; ?></td>
                                                 <td class="td-date_reception"> <?php echo $data['date_reception'] ?? '' ; ?></td>
                                                 <td class="td-intitule"> <?php echo $data['intitule'] ?? '' ; ?></td>
-                                                <td class="td-objet"><div><?php echo $data['objet'] ?? '' ; ?></div>
+                                                <td class="td-objet"><div><?php echo nettoyer_html($data['objet'] ?? ''); ?></div>
                                                 </td>
                                                 <td class="td-fichier"><?php Html :: page_link_file($data['fichier']); ?></td>
                                                 <td class="td-etat_etat"> <?php echo $data['etat_etat'] ?? '' ; ?></td>

@@ -185,7 +185,7 @@ class ImputationController extends SecureController{
 			"imputation.date_limite_traite", 
 			"imputation.niveau", 
 			"imputation.origine");
-		if($value){
+		if($value && est_nom_de_colonne($rec_id)){
 			$db->where($rec_id, urldecode($value)); //select record based on field name
 		}
 		else{
@@ -193,6 +193,11 @@ class ImputationController extends SecureController{
 		}
 		$db->join("etat_imputation", "imputation.etat_traitement = etat_imputation.idetatimputation", "INNER ");
 		$db->join("user", "imputation.iduser = user.iduser", "INNER ");  
+		// Un agent ne consulte que les imputations qui lui sont adressees ou
+		// qu'il a lui-meme emises (meme regle que la liste).
+		if (!utilisateur_voit_toutes_les_imputations()) {
+			$db->where("(imputation.iduser = ? OR imputation.origine = ?)", array(USER_ID, USER_ID));
+		}
 		$record = $db->getOne($tablename, $fields );
 		if($record){
 			$page_title = $this->view->page_title = get_lang('vue_imputation');
@@ -629,8 +634,24 @@ $db->insert("evenement", $table_data);
 				'instruction' => 'sanitize_string',
 			);
 			$modeldata = $this->modeldata = $this->validate_form($postdata);
+			// Controle d'acces : un agent ne traite que SES imputations. Avant,
+			// il suffisait de changer le numero dans l'adresse pour traiter (ou
+			// reaffecter, via les champs iduser/idcourrier) celle d'un collegue.
+			$db->where("imputation.idimputation", $rec_id);
+			if (!utilisateur_voit_toutes_les_imputations()) {
+				$db->where("imputation.iduser", USER_ID);
+			}
+			$existante = $db->getOne($tablename, array("idimputation", "idcourrier", "iduser"));
+			if (empty($existante)) {
+				$this->set_flash_msg("Imputation introuvable ou non autorisee.", "danger");
+				return $this->redirect("imputation/traitement_imputation");
+			}
+			// Le courrier et le destinataire ne se modifient pas depuis cet ecran.
+			$modeldata['idcourrier'] = $existante['idcourrier'];
+			unset($modeldata['iduser'], $modeldata['idimputation']);
+			$this->modeldata = $modeldata;
 			if($this->validated()){
-				$db->where("imputation.idimputation", $rec_id);;
+				$db->where("imputation.idimputation", $existante['idimputation']);
 				$bool = $db->update($tablename, $modeldata);
 				$numRows = $db->getRowCount(); //number of affected rows. 0 = no record field updated
 				if($bool && $numRows){
@@ -690,7 +711,10 @@ if ($modeldata['etat_traitement'] == Circuit::IMPUTATION_TRAITEE)
 				}
 			}
 		}
-		$db->where("imputation.idimputation", $rec_id);;
+		$db->where("imputation.idimputation", $rec_id);
+		if (!utilisateur_voit_toutes_les_imputations()) {
+			$db->where("imputation.iduser", USER_ID);
+		}
 		$data = $db->getOne($tablename, $fields);
 		$page_title = $this->view->page_title = get_lang('modifier');
 		if(!$data){

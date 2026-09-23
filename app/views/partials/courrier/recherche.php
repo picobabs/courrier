@@ -289,7 +289,7 @@ $show_pagination = $this->show_pagination;
                                                             <?php print_lang('intitule'); ?>:  
                                                         </span>
                                                     <?php echo $data['intitule'] ?? '' ; ?></div>
-                                                    <div><?php echo $data['objet'] ?? '' ; ?></div>
+                                                    <div><?php echo nettoyer_html($data['objet'] ?? ''); ?></div>
                                                     <div class="mb-2">  <?php Html :: page_link_file($data['fichier']); ?></div>
                                                     <div class="mb-2">  
                                                         <span class="font-weight-light text-muted ">

@@ -147,7 +147,7 @@ class EvenementController extends SecureController{
 			"user2.division AS user2_division", 
 			"user2.online AS user2_online", 
 			"evenement.idcourrier");
-		if($value){
+		if($value && est_nom_de_colonne($rec_id)){
 			$db->where($rec_id, urldecode($value)); //select record based on field name
 		}
 		else{

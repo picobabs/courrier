@@ -146,7 +146,7 @@ class CourrierController extends SecureController{
 			"droit_lister.etat_courrier AS droit_lister_etat_courrier", 
 			"courrier.numero_courrier", 
 			"courrier.date_saisie");
-		if($value){
+		if($value && est_nom_de_colonne($rec_id)){
 			$db->where($rec_id, urldecode($value)); //select record based on field name
 		}
 		else{

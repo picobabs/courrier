@@ -142,7 +142,7 @@ class UserController extends SecureController{
 			"niveau_imputation.idniveau AS niveau_imputation_idniveau", 
 			"niveau_imputation.niveau_imputation AS niveau_imputation_niveau_imputation", 
 			"user.online");
-		if($value){
+		if($value && est_nom_de_colonne($rec_id)){
 			$db->where($rec_id, urldecode($value)); //select record based on field name
 		}
 		else{
