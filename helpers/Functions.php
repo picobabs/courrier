@@ -38,6 +38,20 @@ function safe_sanitize_string($value)
 }
 
 /**
+ * Verifie qu'une valeur venue de l'URL est un simple nom de colonne
+ * ("etat" ou "courrier.etat"). Les listes filtrent avec
+ * $db->where($fieldname, $fieldvalue) : le nom de colonne est insere tel quel
+ * dans la requete SQL et ne peut pas etre passe en parametre. Sans ce controle,
+ * une URL comme courrier/index/1=1 OR SLEEP(5)/x permettait une injection SQL.
+ * @param string $nom
+ * @return bool
+ */
+function est_nom_de_colonne($nom)
+{
+	return is_string($nom) && preg_match('/^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)?$/', $nom) === 1;
+}
+
+/**
  * Indique si l'utilisateur connecte porte un profil administrateur, tel que
  * declare dans config.php (ROLES_ADMINISTRATEUR).
  * Les listes de choix et les listes de courriers sont filtrees par les tables
@@ -715,7 +729,16 @@ function number_to_words($val, $lang = "en")
 function set_cookie($name, $value, $days = 30)
 {
 	$expiretime = time() + (86400 * $days);
-	setcookie(APP_ID . $name, $value, $expiretime, "/");
+	// HttpOnly : le cookie n'est pas lisible par JavaScript (vol par XSS).
+	// Secure : envoye uniquement en HTTPS quand le site est en HTTPS.
+	$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+	setcookie(APP_ID . $name, $value, array(
+		'expires' => $expiretime,
+		'path' => '/',
+		'secure' => $secure,
+		'httponly' => true,
+		'samesite' => 'Lax',
+	));
 }
 
 /**
@@ -767,8 +790,15 @@ function random_chars($limit = 12, $context = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg
  */
 function random_str($limit = 12, $context = 'abcdefghijklmnopqrstuvwxyz1234567890')
 {
-	$l = ($limit <= strlen($context) ? $limit : strlen($context));
-	return substr(str_shuffle($context), 0, $l);
+	// str_shuffle() n'est pas un generateur cryptographique et ne repete jamais
+	// un caractere : les cles "se souvenir de moi" et de reinitialisation de
+	// mot de passe etaient previsibles. random_int() est sur.
+	$max = strlen($context) - 1;
+	$out = '';
+	for ($i = 0; $i < (int) $limit; $i++) {
+		$out .= $context[random_int(0, $max)];
+	}
+	return $out;
 }
 
 /**

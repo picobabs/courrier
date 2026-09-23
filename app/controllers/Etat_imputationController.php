@@ -44,7 +44,7 @@ class Etat_imputationController extends SecureController{
 		else{
 			$db->orderBy("etat_imputation.idetatimputation", ORDER_TYPE);
 		}
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		$tc = $db->withTotalCount();

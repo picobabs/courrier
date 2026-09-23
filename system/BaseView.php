@@ -1,6 +1,7 @@
 <?php
 defined('ROOT') or exit('No direct script access allowed');
 use Dompdf\Dompdf;
+use Dompdf\Options;
 
 /**
  * Application Base View
@@ -314,9 +315,18 @@ class BaseView
 		elseif ($page_format == "pdf") {
 			$report_body = $this->parse_report_html(); //get exportable content
 			$filename = $this->report_filename;
-			$dompdf = new Dompdf();
+			// Dompdf 3 : les images distantes ne sont autorisees que depuis le site
+			// lui-meme (logo, pieces), pour eviter que le PDF ne serve a interroger
+			// d'autres serveurs du reseau.
+			$options = new Options();
+			$options->setChroot(ROOT);
+			$options->setIsRemoteEnabled(true);
+			$siteHost = parse_url(SITE_ADDR, PHP_URL_HOST);
+			if (!empty($siteHost)) {
+				$options->setAllowedRemoteHosts(array($siteHost));
+			}
+			$dompdf = new Dompdf($options);
 			$dompdf->loadHtml($report_body);
-			$dompdf->set_option('isRemoteEnabled', true); //allow to display external images
 			// (Optional) Setup the paper size and orientation
 			$dompdf->setPaper($this->report_paper_size, $this->report_orientation);
 			// Render the HTML as PDF

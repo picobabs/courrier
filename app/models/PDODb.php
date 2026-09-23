@@ -1161,7 +1161,7 @@ class PDODb
      *
      * @return bool|array Boolean indicating the insertion failed (false), else return id-array ([int])
      */
-    public function insertMulti($tableName, array $multiInsertData, array $dataKeys = null)
+    public function insertMulti($tableName, array $multiInsertData, ?array $dataKeys = null)
     {
         // only auto-commit our inserts, if no transaction is currently running
         $autoCommit = (isset($this->_transaction_in_progress) ? !$this->_transaction_in_progress : true);
@@ -1433,6 +1433,12 @@ class PDODb
         $allowedDirection = ["ASC", "DESC"];
         $orderbyDirection = strtoupper(trim($orderbyDirection));
         $orderByField     = preg_replace("/[^-a-z0-9\.\(\),_`\*\'\"]+/i", '', $orderByField);
+        // Le champ de tri vient souvent de l'URL (?orderby=...). Le filtrage
+        // ci-dessus laissait passer des appels de fonction comme SLEEP(5) :
+        // injection SQL a l'aveugle. Seul un nom de colonne simple est accepte.
+        if (!is_array($customFields) && !preg_match('/^`?[A-Za-z_][A-Za-z0-9_]*`?(\.`?[A-Za-z_][A-Za-z0-9_]*`?)?$/', $orderByField)) {
+            return $this;
+        }
         // Add table prefix to orderByField if needed.
         //FIXME: We are adding prefix only if table is enclosed into `` to distinguish aliases
         // from table names
@@ -1442,7 +1448,7 @@ class PDODb
         }
         if (is_array($customFields)) {
             foreach ($customFields as $key => $value) {
-                $customFields[$key] = preg_replace("/[^-a-z0-9\.\(\),_$quote ]+/i", '', $value);
+                $customFields[$key] = preg_replace("/[^-a-z0-9\.\(\),_ ]+/i", '', $value);
             }
             $orderByField = 'FIELD ('.$orderByField.', "'.implode('","', $customFields).'")';
         }

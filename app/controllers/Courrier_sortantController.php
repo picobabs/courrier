@@ -73,7 +73,7 @@ class Courrier_sortantController extends SecureController{
 		else{
 			$db->orderBy("courrier_sortant.idcourrier", ORDER_TYPE);
 		}
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		if(!empty($request->courrier_sortant_destinataire)){

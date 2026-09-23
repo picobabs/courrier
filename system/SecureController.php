@@ -44,6 +44,7 @@ class SecureController extends BaseController{
 				$db->where("login_session_key", hash_value($session_key));
 				$user = $db->getOne("user");
 				if (!empty($user)) {
+					unset($user['password']); // ne pas garder le hash du mot de passe en session
 					set_session("user_data", $user);
 				}
 			}

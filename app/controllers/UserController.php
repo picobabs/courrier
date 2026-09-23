@@ -76,7 +76,7 @@ class UserController extends SecureController{
 		else{
 			$db->orderBy("user.iduser", ORDER_TYPE);
 		}
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		if(!empty($request->user_niveau_imputation)){

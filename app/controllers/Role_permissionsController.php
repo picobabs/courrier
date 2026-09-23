@@ -48,7 +48,7 @@ class Role_permissionsController extends SecureController{
 		else{
 			$db->orderBy("role_permissions.permission_id", ORDER_TYPE);
 		}
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		$tc = $db->withTotalCount();

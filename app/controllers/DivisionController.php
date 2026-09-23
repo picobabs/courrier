@@ -49,7 +49,7 @@ class DivisionController extends SecureController{
 		else{
 			$db->orderBy("division.iddivision", ORDER_TYPE);
 		}
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		if(!empty($request->division_direction)){

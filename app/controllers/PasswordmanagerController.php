@@ -16,7 +16,7 @@ class PasswordmanagerController extends BaseController{
 			$user = $db->getOne($tablename, array('iduser', 'login'));
 			if(!empty($user)){
 				//Generate new password reset
-				$password_reset_key = password_hash(random_str(), PASSWORD_DEFAULT);
+				$password_reset_key = bin2hex(random_bytes(32)); // cle aleatoire sure
 				$date_to_expire = format_date("+1day");
 				$modeldata = array(
 					"password_reset_key" => hash_value($password_reset_key),
@@ -36,7 +36,7 @@ class PasswordmanagerController extends BaseController{
 				$mailbody = str_ireplace("{{sitename}}" , $sitename,$mailbody);
 				$mailer = new Mailer;
 				if($mailer->send_mail($email, $mailtitle, $mailbody) == true){
-					$this->render_view("passwordmanager/password_reset_link_sent.php", $mailbody, "info_layout.php");
+					$this->render_view("passwordmanager/password_reset_link_sent.php", null, "info_layout.php");
 				}
 				else{
 					$msg = get_lang('erreur_lors_de_l_envoi_du_courrier_lectronique_veuillez_contacter_l_administrateur_syst_me_pour_plus_d_informations');
@@ -65,8 +65,12 @@ class PasswordmanagerController extends BaseController{
 				if($password_has_not_expired){
 					if(!empty($_POST['password'])){
 						$password = $_POST["password"]; 
-						$cpassword = $_POST["cpassword"];
-						if($password == $cpassword){
+						$cpassword = isset($_POST["cpassword"]) ? $_POST["cpassword"] : '';
+						if(strlen($password) < 8){
+							$this->set_page_error("Le mot de passe doit contenir au moins 8 caracteres.");
+							$this->render_view("passwordmanager/password_reset_form.php", null, "info_layout.php");
+						}
+						elseif($password === $cpassword){
 							$new_password_hash = password_hash($password , PASSWORD_DEFAULT);
 							$new_date_to_expire = format_date("3 months");
 							$new_password_data = array(

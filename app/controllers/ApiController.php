@@ -15,6 +15,15 @@ class ApiController extends SecureController
 
 	function json($action, $arg1 = null, $arg2 = null)
 	{
+		// Seules les methodes de donnees declarees dans SharedController sont
+		// appelables. Auparavant, n'importe quelle methode publique heritee de
+		// BaseController (render_view, redirect...) pouvait etre invoquee avec
+		// des arguments choisis dans l'URL.
+		$autorisees = array_diff(get_class_methods('SharedController'), get_class_methods('BaseController'));
+		if (!is_string($action) || !in_array($action, $autorisees, true)) {
+			render_error("Action inconnue", 404);
+			return;
+		}
 		$model = new SharedController;
 		$args = array($arg1, $arg2);
 		$data = call_user_func_array(array($model, $action), $args);

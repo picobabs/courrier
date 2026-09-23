@@ -1,5 +1,5 @@
 # Dependances installees par Composer : elles se reinstallent avec
-# « composer install » a partir de composer.json et composer.lock.
+# « composer install » a partir de composer.json.
 # Les versionner alourdit le depot de 12 Mo sans aucun benefice.
 /vendor/
 

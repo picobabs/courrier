@@ -40,7 +40,7 @@ class IndexController extends BaseController{
 				set_session("user_data", $user); // Set active user data in a sessions
 				//if Remeber Me, Set Cookie
 				if($rememberme == true){
-					$sessionkey = time().random_str(20); // Generate a session key for the user
+					$sessionkey = bin2hex(random_bytes(32)); // cle aleatoire sure (64 caracteres)
 					//Update user session info in database with the session key
 					$db->where("iduser", $user['iduser']);
 					$res = $db->update($tablename, array("login_session_key" => hash_value($sessionkey)));

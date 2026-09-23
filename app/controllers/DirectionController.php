@@ -44,7 +44,7 @@ class DirectionController extends SecureController{
 		else{
 			$db->orderBy("direction.iddirection", ORDER_TYPE);
 		}
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		$tc = $db->withTotalCount();

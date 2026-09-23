@@ -4,7 +4,7 @@ Application web PHP/MySQL de gestion du courrier arrivée et départ : saisie, i
 
 ## Prérequis
 
-- PHP 7.4 ou 8.x avec les extensions `mysqli`, `pdo_mysql`, `mbstring`, `gd`, `dom`
+- PHP 7.4 à 8.4 avec les extensions `mysqli`, `pdo_mysql`, `mbstring`, `gd`, `dom`
 - MySQL ou MariaDB
 - Apache avec `mod_rewrite` (MAMP, XAMPP, WAMP ou un serveur Linux)
 - [Composer](https://getcomposer.org/)
@@ -14,7 +14,7 @@ Application web PHP/MySQL de gestion du courrier arrivée et départ : saisie, i
 ```bash
 git clone https://github.com/picobabs/courrier.git courrieranaser
 cd courrieranaser
-composer install              # installe Dompdf dans vendor/
+composer install              # installe Dompdf 3 dans vendor/ (génère composer.lock)
 cp config.example.php config.php
 ```
 
@@ -23,7 +23,12 @@ cp config.example.php config.php
 3. Donnez au serveur web les droits d'écriture sur `uploads/`, `logs/` et `helpers/cache/`.
 4. Ouvrez `http://localhost/courrieranaser/` dans le navigateur.
 
-En production, mettez `DEVELOPMENT_MODE` à `false` dans `config.php`.
+En production, dans `config.php` :
+
+- mettez `DEVELOPMENT_MODE` à `false`, sinon les erreurs PHP s'affichent à l'écran ;
+- fixez l'adresse du site à la main, par exemple `define("SITE_ADDR", "https://courrier.anaser.sn/");`, au lieu de la déduire de l'en-tête `Host`. Sinon, un attaquant peut faire envoyer des liens de réinitialisation de mot de passe qui pointent vers son propre site.
+
+Si vous mettez à jour une installation existante qui utilisait Dompdf 0.8, supprimez `vendor/` et `composer.lock`, puis relancez `composer install`.
 
 ## Structure
 

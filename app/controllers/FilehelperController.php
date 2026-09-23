@@ -63,9 +63,11 @@ class FilehelperController extends SecureController
 
 	function resizeimg()
 	{
-		$img = $this->src; //get image path from GET['src']
-		$width = $this->w; //get image width from GET['w']
-		$height = $this->h; //get image height from GET['h']
+		// Les parametres GET sont dans $this->request (et non $this->src...) :
+		// l'ancien code lisait des proprietes inexistantes, toujours vides.
+		$img = isset($this->request->src) ? $this->request->src : null;
+		$width = isset($this->request->w) ? $this->request->w : null;
+		$height = isset($this->request->h) ? $this->request->h : null;
 		set_img_src($img, $width, $height, 0, true);
 	}
 

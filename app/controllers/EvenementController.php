@@ -83,7 +83,7 @@ class EvenementController extends SecureController{
 		else{
 			$db->orderBy("idevenement", "DESC");
 		}
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		$tc = $db->withTotalCount();
@@ -443,7 +443,7 @@ class EvenementController extends SecureController{
 		}
 		// idcourrier vient de l'URL : force en entier pour empecher toute injection SQL.
 		$db->where(" idcourrier=" . (int) (isset($_GET['idcourrier']) ? $_GET['idcourrier'] : 0));
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		$tc = $db->withTotalCount();

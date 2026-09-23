@@ -115,7 +115,7 @@ class ImputationController extends SecureController{
    OR imputation.iduser='".intval(USER_ID)."'
  )
 )");
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		$tc = $db->withTotalCount();
@@ -578,7 +578,7 @@ $db->insert("evenement", $table_data);
 		$db->where(" (imputation.iduser='".intval(USER_ID)."'
  AND imputation.etat_traitement IN (".Circuit::liste(Circuit::etatsImputationAOuvrir()).")
  AND courrier.etat = ".Circuit::COURRIER_IMPUTE.") ");
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		if(!empty($request->imputation_etat_traitement)){
@@ -802,7 +802,7 @@ if ($modeldata['etat_traitement'] == Circuit::IMPUTATION_TRAITEE)
 		if (!utilisateur_voit_toutes_les_imputations()) {
 			$db->where("(imputation.iduser='".intval(USER_ID)."' OR imputation.origine='".intval(USER_ID)."')");
 		}
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		$tc = $db->withTotalCount();

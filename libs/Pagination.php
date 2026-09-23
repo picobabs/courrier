@@ -6,6 +6,8 @@
  * @category  View Helper
  */
 
+// PHP 8.2+ : autorise les proprietes creees a la volee (sinon avertissement "Creation of dynamic property").
+#[\AllowDynamicProperties]
 class Pagination
 {
 	/**

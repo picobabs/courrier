@@ -6,6 +6,8 @@ defined('ROOT') OR exit('No direct script access allowed');
 * Other Controllers must extend to the class 
 * Controllers which do not need page authentication and resource authorization can extend to this class
 */
+// PHP 8.2+ : autorise les proprietes creees a la volee (sinon avertissement "Creation of dynamic property").
+#[\AllowDynamicProperties]
 class BaseController{
 	/**
 	 * use to check if current controller can continue to dispatch page after authentication or authorization

@@ -87,7 +87,7 @@ class CourrierController extends SecureController{
 		if (!(function_exists('utilisateur_est_administrateur') && utilisateur_est_administrateur())) {
 			$db->where(" droit_lister.roles='".USER_ROLE."'");
 		}
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		if(!empty($request->courrier_etat)){
@@ -510,7 +510,7 @@ $db->insert("evenement", $table_data);
 		elseif (!utilisateur_est_administrateur()) {
 			$db->where(" roles_courrier.roles='".intval(USER_ROLE)."'");
 		}
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		$tc = $db->withTotalCount();
@@ -614,7 +614,7 @@ $db->insert("evenement", $table_data);
 		if (!(function_exists('utilisateur_est_administrateur') && utilisateur_est_administrateur())) {
 			$db->where(" roles_courrier.roles='".USER_ROLE."'");
 		}
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		$tc = $db->withTotalCount();
@@ -719,14 +719,20 @@ $db->insert("evenement", $table_data);
 		if (!utilisateur_est_administrateur()) {
 			$db->where(" droit_lister.roles='".intval(USER_ROLE)."'");
 		}
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		if(!empty($request->courrier_date_reception)){
 			$vals = explode("-to-", str_replace(" ", "", $request->courrier_date_reception));
-			$startdate = $vals[0];
-			$enddate = $vals[1];
-			$db->where("courrier.date_reception BETWEEN '$startdate' AND '$enddate'");
+			// Les dates etaient inserees telles quelles dans la requete SQL
+			// (injection possible). Elles sont desormais validees puis passees
+			// en parametres.
+			$startdate = isset($vals[0]) ? $vals[0] : '';
+			$enddate = isset($vals[1]) ? $vals[1] : $startdate;
+			$format_date = '/^\d{4}-\d{2}-\d{2}$/';
+			if (preg_match($format_date, $startdate) && preg_match($format_date, $enddate)) {
+				$db->where("courrier.date_reception BETWEEN ? AND ?", array($startdate, $enddate));
+			}
 		}
 		if(!empty($request->courrier_expediteur)){
 			$val = $request->courrier_expediteur;

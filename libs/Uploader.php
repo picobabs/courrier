@@ -11,6 +11,8 @@
 #
 # ======================================================================== #
 
+// PHP 8.2+ : autorise les proprietes creees a la volee (sinon avertissement "Creation of dynamic property").
+#[\AllowDynamicProperties]
 class Uploader {
 
     protected $options = array(
@@ -166,7 +168,11 @@ class Uploader {
             if(@$field['error'][$file['index']] > 0 && array_key_exists($field['error'][$file['index']], $this->error_messages)) $errors[] = $this->error_messages[$field['error'][$file['index']]];
             
             if(!empty($options['extensions'])  && $options['extensions'] != '*'){
-                if(stripos($options['extensions'], strtolower($file['extension'])) === false){
+                // Comparaison exacte : l'ancien test stripos() acceptait toute
+                // extension contenue dans la liste (ex. "x", "ls") et, en PHP 8,
+                // un fichier sans extension.
+                $autorisees = array_filter(array_map(function($e){ return strtolower(ltrim(trim($e), '.')); }, explode(',', $options['extensions'])));
+                if($file['extension'] === '' || !in_array(strtolower($file['extension']), $autorisees, true)){
                     $errors[] = $this->error_messages['accept_file_types'];
                 }
             }

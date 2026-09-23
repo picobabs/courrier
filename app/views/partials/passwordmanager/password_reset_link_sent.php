@@ -18,22 +18,8 @@
 	<hr />
 	<a href="<?php print_link(""); ?>" class="btn btn-info"><?php print_lang('cliquez_ici_pour_vous_identifier'); ?></a>
 	<?php
-	if (DEVELOPMENT_MODE) {
-		$mailbody = $this->view_data;
-		?>
-		<hr />
-		<div class="bg-light p-4 border">
-			<div class="text-danger">
-				<h3>
-					<b>Disclaimer:</b> You are seeing this because you published under development mode.
-					<br />We understand that sending email in localhost might be problematic.
-				</h3>
-				<div class="text-muted">To edit the email template, browse to :- <i>app/view/partials/passwordmanager/password_reset_email_template.html</i></div>
-			</div>
-			<hr />
-			<?php echo $mailbody; ?>
-		</div>
-	<?php
-	}
+	// Le contenu du message (avec le lien de reinitialisation) etait affiche ici
+	// en mode developpement : n'importe qui pouvait alors saisir l'adresse d'un
+	// autre utilisateur et prendre le controle de son compte. Supprime.
 	?>
 </div>

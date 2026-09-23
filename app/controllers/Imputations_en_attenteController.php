@@ -92,7 +92,7 @@ class Imputations_en_attenteController extends SecureController{
 		else{
 			$db->orderBy("imputations_en_attente.idimputation", ORDER_TYPE);
 		}
-		if($fieldname){
+		if($fieldname && est_nom_de_colonne($fieldname)){
 			$db->where($fieldname , $fieldvalue); //filter by a single field name
 		}
 		$tc = $db->withTotalCount();
